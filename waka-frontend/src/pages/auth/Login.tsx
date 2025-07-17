@@ -2,9 +2,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from '@tanstack/react-form';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
-import { authAPI } from '../../services/api';
-import { loginSchema } from '../../schemas/auth';
+import { authAPI } from '@/services/api';
+import { loginSchema } from '@/schemas/auth';
 import type { AnyFieldApi } from '@tanstack/react-form'
+import { AuthBackground } from '@/components/auth/AuthBackground';
+import { AuthLogo } from '@/components/auth/AuthLogo';
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -47,16 +49,19 @@ export default function Login() {
   });
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Welcome Back</h2>
-        
-        {loginMutation.error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex items-center">
-            <FiAlertCircle className="mr-2" />
-            {loginMutation.error.message}
-          </div>
-        )}
+    <>
+      <AuthBackground />
+      <div className="min-h-[80vh] flex items-center justify-center relative z-10">
+        <div className="bg-white/70 backdrop-blur-sm p-8 rounded-lg shadow-lg w-full max-w-md">
+        <AuthLogo />
+          <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+
+          {loginMutation.error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex items-center">
+              <FiAlertCircle className="mr-2" />
+              {loginMutation.error.message}
+            </div>
+          )}
 
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -71,12 +76,12 @@ export default function Login() {
                     <input
                       type="email"
                       id={field.name}
-                      name={field.name}             
+                      name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
-                        ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
+                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
                       placeholder="Enter your email"
                     />
                     <FieldInfo field={field} />
@@ -94,12 +99,12 @@ export default function Login() {
                     <input
                       type="password"
                       id={field.name}
-                      name={field.name}             
+                      name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                        ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
+                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
                       placeholder="Enter your password"
                     />
                     <FieldInfo field={field} />
@@ -117,13 +122,14 @@ export default function Login() {
             </button>
           </form>
 
-        <p className="mt-4 text-center text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">
-            Sign up
-          </Link>
-        </p>
+          <p className="mt-4 text-center text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
