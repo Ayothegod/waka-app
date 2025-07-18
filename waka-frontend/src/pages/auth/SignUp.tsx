@@ -6,8 +6,8 @@ import { FiUser, FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 import { authAPI } from '@/services/api';
 import { signupSchema } from '@/schemas/auth';
 import type { AnyFieldApi } from '@tanstack/react-form'
-import { AuthBackground } from '../components/auth/AuthBackground';
-import { AuthLogo } from '../components/auth/AuthLogo';
+import { AuthBackground } from '@/components/auth/AuthBackground';
+import { AuthLogo } from '@/components/auth/AuthLogo';
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -24,7 +24,7 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   const signupMutation = useMutation({
-    mutationFn: authAPI.signup,
+    mutationFn: (values: { name: string; email: string, password: string }) => authAPI.signup(values),
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       navigate('/');
@@ -40,7 +40,8 @@ export default function SignUp() {
     onSubmit: async ({ value }) => {
       try {
         await signupSchema.parseAsync(value);
-        return value;
+        await signupMutation.mutate(value);
+        // return value;
       } catch (error) {
         return { error };
       }

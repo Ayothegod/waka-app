@@ -1,10 +1,9 @@
-const baseUrl = import.meta.env.API_BASE_URL;  //default: 'http://localhost:3000/api'
 
-async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('token');
+const baseUrl = import.meta.env.VITE_API_BASE_URL;  //default: 'https://api.mantahq.com/api/workflow/tolu/tests'
+
+async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   };
 
@@ -12,9 +11,10 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
     ...options,
     headers,
   });
+  
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.statusText}`);
+    throw new Error(`${response.statusText}` || `Invalid credentials provided.`);
   }
 
   return response.json();
@@ -22,12 +22,12 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
 
 export const authAPI = {
   login: (credentials: { email: string; password: string }) =>
-    fetchWithAuth('/auth/login', {
+    apiFetch('/auth-test-2/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
   signup: (userData: { email: string; password: string; name: string }) =>
-    fetchWithAuth('/auth/signup', {
+    apiFetch('/auth-test-2/signup', {
       method: 'POST',
       body: JSON.stringify(userData),
     }),

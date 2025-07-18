@@ -23,7 +23,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const loginMutation = useMutation({
-    mutationFn: authAPI.login,
+    mutationFn: (values: { email: string, password: string }) => authAPI.login(values),
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       navigate('/');
