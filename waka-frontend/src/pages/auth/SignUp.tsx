@@ -20,6 +20,7 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 }
 
 export default function SignUp() {
+  
   const { signup, isLoading, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -108,7 +109,7 @@ export default function SignUp() {
                 </div>
               )}
             </form.Field>
-
+            
             <form.Field name="password">
         {(field) => (
           <div>

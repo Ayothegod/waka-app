@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
 import AuthRoute from "./components/auth/AuthRoute";
 
+
 function App() {
   return (
     <Router>

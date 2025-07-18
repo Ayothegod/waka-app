@@ -23,11 +23,13 @@ async function apiFetch(endpoint: string, options: RequestInit = {}) {
 export const authAPI = {
   login: (credentials: { email: string; password: string }) =>
     apiFetch('/auth-test-2/login', {
+
       method: 'POST',
       body: JSON.stringify(credentials),
     }),
   signup: (userData: { email: string; password: string; name: string }) =>
     apiFetch('/auth-test-2/signup', {
+
       method: 'POST',
       body: JSON.stringify(userData),
     }),

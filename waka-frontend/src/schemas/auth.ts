@@ -11,6 +11,7 @@ export const loginSchema = z.object({
     .regex(passwordValidation, {
       message: 'Your password is not valid',
     }),
+
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
