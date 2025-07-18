@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from '@tanstack/react-form';
-import { FiUser, FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiAlertCircle, FiEye, FiEyeOff } from 'react-icons/fi';
 import { signupSchema } from '@/schemas/auth';
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { AuthBackground } from '@/components/auth/AuthBackground';
@@ -20,6 +21,7 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 
 export default function SignUp() {
   const { signup, isLoading, error } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -84,12 +86,7 @@ export default function SignUp() {
               )}
             </form.Field>
 
-            <form.Field
-              name="email"
-              validators={{
-                onChange: signupSchema.shape.email,
-              }}
-            >
+            <form.Field name="email">
               {(field) => (
                 <div>
                   <label className="block text-gray-700 mb-2">Email</label>
@@ -112,33 +109,35 @@ export default function SignUp() {
               )}
             </form.Field>
 
-            <form.Field
-              name="password"
-              validators={{
-                onChange: signupSchema.shape.password,
-              }}
-            >
-              {(field) => (
-                <div>
-                  <label className="block text-gray-700 mb-2">Password</label>
-                  <div className="relative">
-                    <FiLock className="absolute left-3 top-3 text-gray-400" />
-                    <input
-                      type="password"
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                      ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
-                      placeholder="Choose a password"
-                    />
-                    <FieldInfo field={field} />
-                  </div>
-                </div>
-              )}
-            </form.Field>
+            <form.Field name="password">
+        {(field) => (
+          <div>
+            <label className="block text-gray-700 mb-2">Password</label>
+            <div className="relative">
+              <FiLock className="absolute left-3 top-3 text-gray-400" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                    ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-gray-400 outline-none"
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+              <FieldInfo field={field} />
+            </div>
+          </div>
+        )}
+      </form.Field>
 
             <button
               type="submit"

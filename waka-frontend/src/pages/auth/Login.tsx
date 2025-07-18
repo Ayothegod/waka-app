@@ -1,30 +1,34 @@
-import { Link } from 'react-router-dom';
-import { useForm } from '@tanstack/react-form';
-import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
-import { loginSchema } from '@/schemas/auth';
-import type { AnyFieldApi } from '@tanstack/react-form'
-import { AuthBackground } from '@/components/auth/AuthBackground';
-import { AuthLogo } from '@/components/auth/AuthLogo';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useForm } from "@tanstack/react-form";
+import { FiMail, FiLock, FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi";
+import { loginSchema } from "@/schemas/auth";
+import type { AnyFieldApi } from "@tanstack/react-form";
+import { AuthBackground } from "@/components/auth/AuthBackground";
+import { AuthLogo } from "@/components/auth/AuthLogo";
+import { useAuth } from "@/contexts/AuthContext";
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
       {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em className="text-red-500 text-sm mt-1">{field.state.meta.errors.map((err) => err.message).join(',')}</em>
+        <em className="text-red-500 text-sm mt-1">
+          {field.state.meta.errors.map((err) => err.message).join(",")}
+        </em>
       ) : null}
-      {field.state.meta.isValidating ? 'Validating...' : null}
+      {field.state.meta.isValidating ? "Validating..." : null}
     </>
-  )
+  );
 }
 
 export default function Login() {
   const { login, isLoading, error } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     onSubmit: async ({ value }) => {
       try {
@@ -44,7 +48,7 @@ export default function Login() {
       <AuthBackground />
       <div className="min-h-[80vh] flex items-center justify-center relative z-10">
         <div className="bg-white/70 backdrop-blur-sm p-8 rounded-lg shadow-lg w-full max-w-md">
-        <AuthLogo />
+          <AuthLogo />
           <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
           {error && (
@@ -54,10 +58,13 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+            className="space-y-4"
+          >
             <form.Field name="email">
               {(field) => (
                 <div>
@@ -72,7 +79,12 @@ export default function Login() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
-                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
+                          ${
+                            field.state.meta.isTouched &&
+                            !field.state.meta.isValid
+                              ? "border-red-500 focus:ring-red-500"
+                              : ""
+                          }`}
                       placeholder="Enter your email"
                     />
                     <FieldInfo field={field} />
@@ -88,16 +100,27 @@ export default function Login() {
                   <div className="relative">
                     <FiLock className="absolute left-3 top-3 text-gray-400" />
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       id={field.name}
                       name={field.name}
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
+                      className={`w-full pl-10 pr-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                    ${
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                        ? "border-red-500 focus:ring-red-500"
+                        : ""
+                    }`}
                       placeholder="Enter your password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-gray-400 outline-none"
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
                     <FieldInfo field={field} />
                   </div>
                 </div>
@@ -109,12 +132,12 @@ export default function Login() {
               disabled={isLoading || form.state.isSubmitting}
               className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
 
           <p className="mt-4 text-center text-gray-600">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link to="/signup" className="text-blue-600 hover:underline">
               Sign up
             </Link>
