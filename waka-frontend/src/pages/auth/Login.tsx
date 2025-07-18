@@ -1,12 +1,11 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { useForm } from '@tanstack/react-form';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
-import { authAPI } from '@/services/api';
 import { loginSchema } from '@/schemas/auth';
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { AuthBackground } from '@/components/auth/AuthBackground';
 import { AuthLogo } from '@/components/auth/AuthLogo';
+import { useAuth } from '@/contexts/AuthContext';
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
@@ -20,15 +19,7 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
 }
 
 export default function Login() {
-  const navigate = useNavigate();
-
-  const loginMutation = useMutation({
-    mutationFn: (values: { email: string, password: string }) => authAPI.login(values),
-    onSuccess: (data) => {
-      localStorage.setItem('token', data.token);
-      navigate('/');
-    },
-  });
+  const { login, isLoading, error } = useAuth();
 
   const form = useForm({
     defaultValues: {
@@ -38,7 +29,7 @@ export default function Login() {
     onSubmit: async ({ value }) => {
       try {
         await loginSchema.parseAsync(value);
-        loginMutation.mutate(value);
+        login(value);
       } catch (error) {
         return { error };
       }
@@ -56,10 +47,10 @@ export default function Login() {
         <AuthLogo />
           <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
-          {loginMutation.error && (
+          {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md flex items-center">
               <FiAlertCircle className="mr-2" />
-              {loginMutation.error.message}
+              {error.message}
             </div>
           )}
 
@@ -81,7 +72,7 @@ export default function Login() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 
-                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
+                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
                       placeholder="Enter your email"
                     />
                     <FieldInfo field={field} />
@@ -104,7 +95,7 @@ export default function Login() {
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                       className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500' : ''}`}
+                          ${field.state.meta.isTouched && !field.state.meta.isValid ? 'border-red-500 focus:ring-red-500' : ''}`}
                       placeholder="Enter your password"
                     />
                     <FieldInfo field={field} />
@@ -115,10 +106,10 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={loginMutation.isPending || form.state.isSubmitting}
+              disabled={isLoading || form.state.isSubmitting}
               className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {loginMutation.isPending ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 

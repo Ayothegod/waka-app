@@ -4,52 +4,58 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }) => void;
-  signup: (userData: { email: string; password: string; name: string }) => void;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
+  signup: (userData: { email: string; password: string; name: string }) => Promise<void>;
   logout: () => void;
+  isLoading: boolean;
+  error: Error | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
   const loginMutation = useMutation({
-    mutationFn: authAPI.login,
+    mutationFn: (values: { email: string, password: string }) => authAPI.login(values),
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
+      setError(null);
       navigate('/');
+    },
+    onError: (error: Error) => {
+      setError(error);
     },
   });
 
   const signupMutation = useMutation({
-    mutationFn: authAPI.signup,
+    mutationFn: (values: { name: string; email: string, password: string }) => authAPI.signup(values),
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
+      setError(null);
       navigate('/');
     },
+    onError: (error: Error) => {
+      setError(error);
+    },
   });
+
+  const login = async (credentials: { email: string; password: string }) => {
+    await loginMutation.mutateAsync(credentials);
+  };
+
+  const signup = async (userData: { email: string; password: string; name: string }) => {
+    await signupMutation.mutateAsync(userData);
+  };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setUser(null);
     queryClient.removeQueries();
     navigate('/login');
   };
@@ -57,12 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user,
-        setUser,
-        isAuthenticated: !!user,
-        login: loginMutation.mutate,
-        signup: signupMutation.mutate,
+        isAuthenticated: !!localStorage.getItem('token'),
+        login,
+        signup,
         logout,
+        isLoading: loginMutation.isPending || signupMutation.isPending,
+        error,
       }}
     >
       {children}
