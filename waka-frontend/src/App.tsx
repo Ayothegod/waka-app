@@ -4,6 +4,8 @@ import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
+import AuthRoute from "./components/auth/AuthRoute";
+
 
 function App() {
   return (
@@ -11,8 +13,22 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<SignUp />} />
+          <Route
+            path="login"
+            element={
+              <AuthRoute isPublic={true}>
+                <Login />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="signup"
+            element={
+              <AuthRoute isPublic={true}>
+                <SignUp />
+              </AuthRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
